@@ -1,0 +1,12 @@
+{
+  "name": "hibernate-slides",
+  "version": "1.0.0",
+  "description": "Slides for hibernate workshop",
+  "main": "slides.md",
+  "scripts": {
+    "start": "reveal-md --watch --css styles/style.css --theme theme/robot-lung.css --template index.html slides.md",
+    "print": "reveal-md --print Hibernate.pdf --css styles/style.css --theme theme/robot-lung.css --template index.html --puppeteer-launch-args='--no-sandbox --disable-dev-shm-usage' slides.md "
+  },
+  "author": "Krzysztof Atlasik <krzysztof.atlasik@pm.me>",
+  "license": "ISC"
+}
