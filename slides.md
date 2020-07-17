@@ -13,7 +13,7 @@ title: Wprowadzenie do Hibernate
 
 Ze wględu na to, że **Hibernate** zapewnia mapowanie danych z baz relacyjnych na obiekty jest nazywany frameworkiem **ORM** (*Object-Relational Mapping*).
 
-**Hibernate** jest implementacją specyfikacji **JPA**&nbsp;(*Jav&nbsp;persistance&nbsp;layer*).
+**Hibernate** jest implementacją specyfikacji **JPA**&nbsp;(*ang. Java&nbsp;Persistance&nbsp;API*).
 
 
 Note: Hibernate powstało w 2001, a JPA w 2006. Inne implementacje: iBatis, EclipseLink, OpenJPA. Istnieją też ORM nie implementujące JPA.
@@ -257,187 +257,22 @@ Note: Hibernate opóźnia zapis, dzięki czemu może stosować rózne optymaliza
 * **remove** usuwa rekord.
 
 
-
 ```java
+entityManager.getTransaction().begin();
 Student student = new Student();
 student.setFirstName("Włodzimierz");
 student.setLastName("Rumak");
-em.persist(student);
+entityManager.persist(student);
 
 student.setFirstname("Włodek");
-```
-
-Note: getReference może wzrócić `hollow object`, którego wszystkie pola oprócz id są leniwie zaczytywane
-
----
-
-Aby stan obiektu został utrwalony w bazie danych, to zmiany muszą być wykonane w obrębie transakcji:
-
-```java
-entityManager.getTransaction().begin();
-
 entityManager.remove(student);
-
 entityManager.getTransaction().commit();
 ```
 
----
+Aby stan obiektu został utrwalony w bazie danych, to zmiany muszą być wykonane w obrębie transakcji:
 
-#### JPQL
 
-**JPQL** (*Java Persistence Query Language*) lub **HQL** (*Hibernate Query Language*) to wbudowany w **JPA** specjalny język zapytań podobny do *SQL* lecz zorientowany obiektowo:
-
-```sql
-from Author
-
-select id, name From Author
-
-from Employee e where e.id = 22
-
-from Author a, Book b where a = book.author
-
-select b from Author a join a.books b where a.id = :id
-
-```
-
-Note: HQL jest case-sensitive
-
----
-
-Aby wykonać zapytanie **JPQL** używamy metody **createQuery**. Następnie, aby pobrać listę wyników wywołujemy **getResultList** na obiekcie **Query**:
-
-```java
-Query query = entityManager.createQuery("from Employee");
-List<Employee> employees = (List<Employee>) query.getResultList();
-```
-Jeżeli podamy klasę jako drugi argument w **createQuery** to stworzymy **TypedQuery**:
-
-```java
-TypedQuery<Employee> query = entityManager.createQuery("from Employee");
-List<Employee> employees = query.getResultList();
-```
-
----
-
-W **JPQL** możemy używać również parametrów zapytań:
-
-```java
-Employee employee = entityManager.createQuery(
-    "from Employee e where e.lastName = :name",
-    Employee.class
-).setParameter("name", name)
-.getFirstResult();
-
-```
-Możemy także korzystać z funkcji zdefiniowanych w **JPQL**, takich jak *concat* lub *upper*:
-```java
-List<String> names =  entityManager.createQuery(
-    "select concat(e.firstName, ' ', e.lastName) from Employee e",
-    String.class
-).getResultList();
-```
-W przypadku gdy zapytanie zwraca więcej niż jedną kolumnę to musimy użyć tablicy **Object[]** aby odzyskać wynik:
-
-```java
-List<Object[]> result = entityManager.createQuery(
-    "select e,d from Employee e, Department d where e.department = d",
-    Object[].class
-).getResultList()
-```
-
----
-
-Możemy pobrać także pojedyńczy wynik za pomocą **getSingleResult** lub **getFirstResult(n)**:
-
-```java
-public Employee getEmployeeByName(String name) {
-    return entityManager.createQuery(
-        "select e from Employee e where e.name like :name",
-        Employee.class
-    ).setParameter("name", "%" + name + "%")
-    .getSingleResult();
-}
-```
-
----
-
-W przypadku, gdy zapytanie nie zwróci wyników, zostanie wyrzucony wyjątek **NoResultException**. W przypadku, gdy nie chcemy
-aby ten wyjątek był propagowany, musimy go obsłużyć:
-
-```java
-public Optional<Employee> getEmployeeByName(String name) {
-    try {
-        Employee employee = entityManager.createQuery(
-            "select e from Employee e where e.name like :name",
-            Employee.class
-        ).setParameter("name", "%" + name + "%")
-        .getSingleResult();
-        return Optional.of(employee);
-    } catch (NoResultException e) {
-        return Optional.empty();
-    }
-}
-```
----
-
-Przy pomocy metod **setFirstResult** oraz **setMaxResults** możemy stronnicować wyniki otrzymane za pomocą zapytania:
-
-```java
-TypedQuery<Employee> query = entityManager.createQuery(
-   "from Employee order by lastName, firstName",
-   Employee.class
-);
-query.setFirstResult(20);
-query.setMaxResults(10);
-Employee employee = query.getResultList();
-```
-
----
-
-##### Zagnieżdżanie obiektów
-
-Struktura klasy nie musi koniecznie być płaska. Możemy zagnieździć w niej klasy, które mają adnotacje **@Embeddable** za pomocą
-adnotacji **@Embedded**.
-
-```java
-@Embeddable
-public class FullName{
-    String salutation;
-    String firstName;
-    String lastName;
-}
-```
-
-```java
-@Entity
-class Person {
-    @Embedded FullName fullName;
-}
-
-```
-
----
-
-Możemy również stworzyć pole, będące kolekcją przechowującą obiekty oznaczone **@Embedded**
-jeżeli oznaczymy je odnotacją **@ElementCollection**:
-
-```java
-@ElementCollection(fetch = FetchType.LAZY)
-@CollectionTable(name = "names", joinColumns = @JoinColumn(name = "name_id"))
-private Set<FullName> names = new HashSet<>();
-```
-
-Za pomocą **@ElementCollection** możemy stworzyć również kolekcję przechowującą proste obiekty, takie jak **String**: 
-
-```java
-@ElementCollection
-@CollectionTable(
-   name = "user_phone_numbers", 
-   joinColumns = @JoinColumn(name = "user_id")
-)
-@Column(name = "phone_number")
-private Set<String> phoneNumbers = new HashSet<>();
-```
+Note: getReference może wzrócić `hollow object`, którego wszystkie pola oprócz id są leniwie zaczytywane
 
 ---
 
@@ -597,6 +432,164 @@ public class FooBar {
 ```
 
 ---
+
+#### JPQL
+
+**JPQL** (*Java Persistence Query Language*) lub **HQL** (*Hibernate Query Language*) to wbudowany w **JPA** specjalny język zapytań podobny do *SQL* lecz zorientowany obiektowo:
+
+```sql
+from Author
+
+select id, name From Author
+
+from Employee e where e.id = 22
+
+from Author a, Book b where a = book.author
+
+select b from Author a join a.books b where a.id = :id
+
+```
+
+Note: HQL jest case-sensitive
+
+---
+
+Aby wykonać zapytanie **JPQL** używamy metody **createQuery**. Następnie, aby pobrać listę wyników wywołujemy **getResultList** na obiekcie **Query**:
+
+```java
+Query query = entityManager.createQuery("from Employee");
+List<Employee> employees = (List<Employee>) query.getResultList();
+```
+Jeżeli podamy klasę jako drugi argument w **createQuery** to stworzymy **TypedQuery**:
+
+```java
+TypedQuery<Employee> query = entityManager.createQuery("from Employee");
+List<Employee> employees = query.getResultList();
+```
+
+---
+
+W **JPQL** możemy używać również parametrów zapytań:
+
+```java
+Employee employee = entityManager.createQuery(
+    "from Employee e where e.lastName = :name",
+    Employee.class
+).setParameter("name", name)
+.getFirstResult();
+
+```
+Możemy także korzystać z funkcji zdefiniowanych w **JPQL**, takich jak *concat* lub *upper*:
+```java
+List<String> names =  entityManager.createQuery(
+    "select concat(e.firstName, ' ', e.lastName) from Employee e",
+    String.class
+).getResultList();
+```
+W przypadku gdy zapytanie zwraca więcej niż jedną kolumnę to musimy użyć tablicy **Object[]** aby odzyskać wynik:
+
+```java
+List<Object[]> result = entityManager.createQuery(
+    "select e,d from Employee e, Department d where e.department = d",
+    Object[].class
+).getResultList()
+```
+
+---
+
+Możemy pobrać także pojedyńczy wynik za pomocą **getSingleResult** lub **getFirstResult**:
+
+```java
+public Employee getEmployeeByName(String name) {
+    return entityManager.createQuery(
+        "select e from Employee e where e.name like :name",
+        Employee.class
+    ).setParameter("name", "%" + name + "%")
+    .getSingleResult();
+}
+```
+
+---
+
+W przypadku, gdy zapytanie nie zwróci wyników, zostanie wyrzucony wyjątek **NoResultException**. W przypadku, gdy nie chcemy
+aby ten wyjątek był propagowany, musimy go obsłużyć:
+
+```java
+public Optional<Employee> getEmployeeByName(String name) {
+    try {
+        Employee employee = entityManager.createQuery(
+            "select e from Employee e where e.name like :name",
+            Employee.class
+        ).setParameter("name", "%" + name + "%")
+        .getSingleResult();
+        return Optional.of(employee);
+    } catch (NoResultException e) {
+        return Optional.empty();
+    }
+}
+```
+---
+
+Przy pomocy metod **setFirstResult** oraz **setMaxResults** możemy stronnicować wyniki otrzymane za pomocą zapytania:
+
+```java
+TypedQuery<Employee> query = entityManager.createQuery(
+   "from Employee order by lastName, firstName",
+   Employee.class
+);
+query.setFirstResult(20);
+query.setMaxResults(10);
+Employee employee = query.getResultList();
+```
+
+---
+
+##### Zagnieżdżanie obiektów
+
+Struktura klasy nie musi koniecznie być płaska. Możemy zagnieździć w niej klasy, które mają adnotacje **@Embeddable** za pomocą
+adnotacji **@Embedded**.
+
+```java
+@Embeddable
+public class FullName{
+    String salutation;
+    String firstName;
+    String lastName;
+}
+```
+
+```java
+@Entity
+class Person {
+    @Embedded FullName fullName;
+}
+
+```
+
+---
+
+Możemy również stworzyć pole, będące kolekcją przechowującą obiekty oznaczone **@Embedded**
+jeżeli oznaczymy je odnotacją **@ElementCollection**:
+
+```java
+@ElementCollection(fetch = FetchType.LAZY)
+@CollectionTable(name = "names", joinColumns = @JoinColumn(name = "name_id"))
+private Set<FullName> names = new HashSet<>();
+```
+
+Za pomocą **@ElementCollection** możemy stworzyć również kolekcję przechowującą proste obiekty, takie jak **String**: 
+
+```java
+@ElementCollection
+@CollectionTable(
+   name = "user_phone_numbers", 
+   joinColumns = @JoinColumn(name = "user_id")
+)
+@Column(name = "phone_number")
+private Set<String> phoneNumbers = new HashSet<>();
+```
+
+---
 ##### Eager vs Lazy Loading
 
 * **Eager** (*chętne*) Loading oznacza, że dane zależne zostaną załadowane podczas pierwszego wczytywania obiektu.
@@ -610,7 +603,7 @@ Również pola klasy oraz kolekcje oznaczone **@ElementCollection** ładowane s�
 
 Możemy zmienić domyślne zachowanie adnotacjami:
 
-````java
+```java
 @OneToOne(fetch=FetchType.LAZY)
 Employee manager;
 
@@ -619,8 +612,8 @@ List<String> phoneNumbers;
 
 @ManyToMany(fetch=FetchType.EAGER)
 List<Department> departmentsl
-
 ```
+
 ---
 
 Dla pól możemy użyć adnotacji `@Basic` aby zdefiniować, czy pole zostanie pobrane leniwie czy chętnie.
@@ -718,6 +711,33 @@ Note: Drugie rozwiązanie dla LazyInitializationException
 
 ---
 
+##### toString, equals i hashCode
+Podczas tworzenia metod **toString**, **equals** oraz **hashCode** musimy zwrócić uwagę, na to, nie używać do ich zdefiniowania pól, które
+będą mogły być leniwie doczytane lub modyfikowane. W celu stworzenia powyższych metod możemy użyć 2 strategii:
+* Możemy użyć klucza biznesowego, który nie będzie się zmieniał dla encji (jak PESEL, ISBN).
+
+* Możemy użyć klucza głównego encji. W przypadku, gdy klucz jest generowany po stronie bazy danych, to wystąpi sytuacja, w której po stworzeniu obiektu klucz jest pusty (jego wartość to **null**. 
+Aby **equals** działo poprawnie, w przypadku, gdy **id** jest równe **null** zawsze zwracamy **false**
+Z **hashCode** zwracamy stałą.
+
+```java
+@Override
+public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null) return false;
+    if (getClass() != o.getClass()) return false;
+    Entity other = (Entity) o;
+    return id != null && id.equals(other.getId());
+}
+
+@Override
+public int hashCode() {
+    return 110;
+}
+```
+
+---
+
 ##### Kaskadowanie
 Encje z zależnościami mogą mieć również skonfigurowane ustawienia kaskadowania.
 Ustawienie kaskady oznacza, że przejściu obiektu z jednego stanu do drugiego **JPA** spowoduje, że również obiekty zależne zmienią stan.
@@ -726,8 +746,6 @@ Ustawienie kaskady oznacza, że przejściu obiektu z jednego stanu do drugiego *
 @OneToOne(cascade = CascadeType.ALL)
 Set<Attachment> attachments;
 ```
-
----
 
 Rodzaje kaskad w **JPA**:
 
@@ -740,32 +758,32 @@ Rodzaje kaskad w **JPA**:
 | remove 	          | REMOVE                 |
 | wszystkie powyższe  | ALL	                   |
 
-
 ---
 
 ##### Dobre praktyki związane z relacjami encji
 
-1. Preferuj **Set** nad **List** dla kolekcji.
-2. Stwórz metody, które ułatwią zarządzanie mapowaniami w dwie strony:
-    ```java
-    @Entity
-    public class Author {    
-        @ManyToMany(mappedBy = "authors")
-        private Set<Book> books = new HashSet<Book>();
-         
-        public void addBook(Book book) {
-            this.books.add(book);
-            book.getAuthors().add(this);
-        }
+* Preferuj **Set** nad **List** dla kolekcji.
+* Stwórz metody, które ułatwią zarządzanie mapowaniami w dwie strony:
+```java
+@Entity
+public class Author {    
+    @ManyToMany(mappedBy = "authors")
+    private Set<Book> books 
+        = new HashSet<Book>();
      
-        public void removeBook(Book book) {
-            this.books.remove(book);
-            book.getAuthors().remove(this);
-        }
+    public void addBook(Book book) {
+        this.books.add(book);
+        book.getAuthors().add(this);
     }
-    ```
-3. Preferuj leniwe ładowanie i korzystaj **join fetch**.
-4. Nie korzystaj z kaskad jeżeli nie jest to konieczne.
+ 
+    public void removeBook(Book book) {
+        this.books.remove(book);
+        book.getAuthors().remove(this);
+    }
+}
+```
+* Preferuj leniwe ładowanie i korzystaj **join fetch**.
+* Nie korzystaj z kaskad jeżeli nie jest to konieczne.
 
 ---
 
@@ -1024,10 +1042,12 @@ List<SecurityGroup> groups = em.createQuery(query).getResultList();
 
 ---
 
-<div style="display: flex; justify-content: center; align-items: center;">
-    ![Mail](images/mail.png)&nbsp;&nbsp;&nbsp;[krzysztof.atlasik@pm.me](mailto:krzysztof.atlasik@pm.me)
+<div class="icon-line">
+    <img alt="github" src="images/github.svg"/>&nbsp;&nbsp;&nbsp;<a href="https://github.com/katlasik">https://github.com/katlasik</a>
 </div>
-
+<div class="icon-line">
+     <img alt="mail" src="images/mail.png"/>&nbsp;&nbsp;&nbsp;<a href="mailto:krzysztof.atlasik@pm.me">krzysztof.atlasik@pm.me</a>
+</div>
 
 
 

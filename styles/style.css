@@ -2,3 +2,234 @@
     border: none;
     box-shadow: none;
 }
+
+.reveal p {
+    font-size: 0.9rem;
+}
+
+.reveal ul li {
+    font-size: 0.9rem;
+}
+
+.reveal ul li pre {
+    font-size: 0.9rem;
+}
+
+.reveal pre.simple {
+    box-shadow: none;
+    width: 80%;
+    font-size: 1.1rem;
+}
+
+.reveal pre code {
+    max-height: 600px;
+    font-size: 0.9em;
+}
+
+.reveal pre code .result {
+    background: darkslateblue;
+    border-radius: 8px;
+}
+
+.reveal pre code .result * {
+    color: white !important;
+}
+
+.reveal pre code .result-error {
+    color: red !important;
+    background: darkslateblue;
+    border-radius: 8px;
+}
+
+.reveal pre code .result-error .hljs-keyword {
+    color: red !important;
+}
+
+.reveal pre code .result-error .hljs-string {
+    color: red !important;
+}
+
+.reveal .badge {
+    display: inline-block;
+    color: crimson !important;
+    background-color: #efef8f;
+    border-radius: 100px;
+    text-align: center;
+    font-size: .75em;
+    width: 1.67em;
+    height: 1.67em;
+    line-height: 1.67em;
+    font-family: "Open Sans","DejaVu Sans",sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    border: 1px solid crimson;
+    user-select: none;
+}
+
+.reveal .badge .hljs-number {
+    color: crimson !important;
+}
+
+.reveal .badge .hljs-comment {
+    color: crimson !important;
+}
+
+.reveal table {
+    font-size: 1rem;
+}
+
+.logo {
+    position: fixed;
+    right: 0;
+    height: 80px;
+    padding: 8px;
+}
+
+@media print {
+    .logo {
+        left: 0;
+        bottom: 0;
+        height: 40px;
+        padding: 4px;
+    }
+}
+
+.reveal .squigly {
+    text-decoration: red underline wavy;
+}
+
+img[alt$="=:"] {
+    float: right;
+    padding-left: 5vw;
+    max-width: 30vw;
+}
+
+img[alt^=":="] {
+    float: left;
+    padding-right: 5vw;
+    max-width: 30vw;
+}
+
+.icon-line {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+
+.icon-line img {
+    height: 50px;
+    width: 50px;
+}
+
+.warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+    border-radius: 10px;
+    position: relative;
+    padding: 10px 10px 10px 50px;
+}
+
+.warning:before {
+    content:'!';
+    color: red;
+    font-weight: bold;
+    font-size: 1.75em;
+    font-family: "Ubuntu";
+    position: absolute;
+    top: 50%;
+    left: 30px;
+    transform: translateY(-50%);
+}
+
+.reveal blockquote {
+    text-align: left;
+}
+
+.reveal blockquote ul ul {
+    margin-left: 10px;
+    padding-left: 20px;
+    border-left: 1px dashed #ddd;
+}
+
+.reveal blockquote li {
+    list-style: none;
+    color: #888;
+    font-size: 17px;
+    font-style: italic;
+    font-weight: normal;
+}
+
+.reveal blockquote a {
+    border-bottom: 1px solid transparent;
+    color: #888;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.reveal blockquote a:hover {
+    border-color: #eee;
+    color: #000;
+}
+
+.reveal blockquote .folder,
+.reveal blockquote .folder > a {
+    color: #777;
+    font-weight: bold;
+}
+
+
+.reveal blockquote li:before {
+    margin-right: 10px;
+    content: "";
+    height: 20px;
+    vertical-align: middle;
+    width: 20px;
+    background-repeat: no-repeat;
+    display: inline-block;
+    /* file icon by default */
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path fill='lightgrey' d='M85.714,42.857V87.5c0,1.487-0.521,2.752-1.562,3.794c-1.042,1.041-2.308,1.562-3.795,1.562H19.643 c-1.488,0-2.753-0.521-3.794-1.562c-1.042-1.042-1.562-2.307-1.562-3.794v-75c0-1.487,0.521-2.752,1.562-3.794 c1.041-1.041,2.306-1.562,3.794-1.562H50V37.5c0,1.488,0.521,2.753,1.562,3.795s2.307,1.562,3.795,1.562H85.714z M85.546,35.714 H57.143V7.311c3.05,0.558,5.505,1.767,7.366,3.627l17.41,17.411C83.78,30.209,84.989,32.665,85.546,35.714z' /></svg>");
+    background-position: center 2px;
+    background-size: 60% auto;
+}
+
+.reveal blockquote li.folder:before {
+    /* folder icon if folder class is specified */
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path fill='lightblue' d='M96.429,37.5v39.286c0,3.423-1.228,6.361-3.684,8.817c-2.455,2.455-5.395,3.683-8.816,3.683H16.071 c-3.423,0-6.362-1.228-8.817-3.683c-2.456-2.456-3.683-5.395-3.683-8.817V23.214c0-3.422,1.228-6.362,3.683-8.817 c2.455-2.456,5.394-3.683,8.817-3.683h17.857c3.422,0,6.362,1.228,8.817,3.683c2.455,2.455,3.683,5.395,3.683,8.817V25h37.5 c3.422,0,6.361,1.228,8.816,3.683C95.201,31.138,96.429,34.078,96.429,37.5z' /></svg>");
+    background-position: center top;
+    background-size: 75% auto;
+}
+
+.reveal .slide-number {
+    color: #363636;
+    font-weight: bold;
+    background-color: white;
+    font-size: 1.2rem;
+}
+
+.reveal .accent {
+    color: deeppink;
+}
+
+.reveal .nok:before {
+    content: "\2716";
+    color: red;
+    float: right;
+    background-color: white;
+    border-radius: 20px;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    padding-top: 1px;
+}
+
+.reveal .ok:before {
+    content: "\2714";
+    color: green;
+    float: right;
+    background-color: white;
+    border-radius: 20px;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+}

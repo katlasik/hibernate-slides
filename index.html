@@ -26,6 +26,7 @@
   {{/watch}}
 </head>
 <body>
+<img class= "logo" src="/logos/sda.png"/>
 <div class="reveal">
   <div class="slides">{{{slides}}}</div>
 </div>
@@ -61,13 +62,15 @@
 
   // default options to init reveal.js
   var defaultOptions = {
-    controls: true,
+    controls: false,
     progress: true,
     history: true,
+    pdfSeparateFragments: false,
     center: true,
-    transition: 'default', // none/fade/slide/convex/concave/zoom
+    transition: 'slide', // none/fade/slide/convex/concave/zoom
     dependencies: deps,
     chalkboard: {},
+    slideNumber: true,
     keyboard: {
       90: function () {
         RevealChalkboard.toggleNotesCanvas()
@@ -86,6 +89,27 @@
 
   // options from URL query string
   var queryOptions = Reveal.getQueryHash() || {};
+
+
+  let printing = false;
+
+  window.onbeforeprint = () => printing = true;
+
+  setTimeout(() => {
+    document.body.querySelectorAll("code").forEach(e => e.innerHTML = e.innerHTML.replace("!!!OK!!!", "<span class=\"ok\"></span>"));
+    document.body.querySelectorAll("code").forEach(e => e.innerHTML = e.innerHTML.replace("!!!NOK!!!", "<span class=\"nok\"></span>"));
+    document.body.querySelectorAll("code").forEach(e => e.innerHTML = e.innerHTML.replace(/#!#(.*)#!#/g, "<span class=\"result-error\">$1</span>"));
+    document.body.querySelectorAll("code").forEach(e => e.innerHTML = e.innerHTML.replace(/#!(.*)!#/g, printing ? "<span class=\"result\">$1</span>": "<span class=\"result\"><span class=\"fragment\">$1</span></span>"));
+    document.body.querySelectorAll("code").forEach(e => e.innerHTML = e.innerHTML.replace(/\|\|(.*?)\|\|/g, "<span class=\"badge\">$1</span>"));
+    document.body.querySelectorAll("blockquote").forEach(e => e.innerHTML = e.innerHTML.replace(/\|\|(.*)\|\|/g, "<span class=\"badge\">$1</span>"));
+    document.body.querySelectorAll("code").forEach(e => e.innerHTML = e.innerHTML.replace(/__(.*)__/g, "<span class=\"squigly\">$1</span>"));
+    document.body.querySelectorAll("p").forEach(e => e.innerHTML = e.innerHTML.replace(/\|\|(.*)\|\|/g, "<span class=\"badge\">$1</span>"));
+    document.body.querySelectorAll("p").forEach(e => e.innerHTML = e.innerHTML.replace(/=&gt;/g, "<br>"));
+    document.body.querySelectorAll("p").forEach(e => e.innerHTML = e.innerHTML.replace(/@!(.*)!@/g, "<div class=\"warning\">$1</div>"));
+    document.body.querySelectorAll("p").forEach(e => e.innerHTML = e.innerHTML.replace(/!_#/, "<pre class=\"simple\">"));
+    document.body.querySelectorAll("p").forEach(e => e.innerHTML = e.innerHTML.replace(/#_!/, "</pre>"));
+    document.body.querySelectorAll("p").forEach(e => e.innerHTML = e.innerHTML.replace(/@@@(.*?)@@@/g, "<span class=\"accent\">$1</span>"));
+  }, 1000);
 
   var options = extend(defaultOptions, {{{revealOptionsStr}}}, queryOptions);
 </script>
