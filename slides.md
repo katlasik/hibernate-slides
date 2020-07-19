@@ -463,7 +463,7 @@ List<Employee> employees = (List<Employee>) query.getResultList();
 Jeżeli podamy klasę jako drugi argument w **createQuery** to stworzymy **TypedQuery**:
 
 ```java
-TypedQuery<Employee> query = entityManager.createQuery("from Employee");
+TypedQuery<Employee> query = entityManager.createQuery("from Employee", Employee.class);
 List<Employee> employees = query.getResultList();
 ```
 
@@ -492,7 +492,17 @@ W przypadku gdy zapytanie zwraca więcej niż jedną kolumnę to musimy użyć t
 List<Object[]> result = entityManager.createQuery(
     "select e,d from Employee e, Department d where e.department = d",
     Object[].class
-).getResultList()
+).getResultList();
+```
+
+Możemy również skorzystać z klasy **Tuple**:
+```
+List<Tuple> result = entityManager.createQuery(
+    "select e, d from Employee e, Department d where e.department = d",
+    Tuple.class
+).getResultList();
+
+result.get(0).get("e", Department.class);
 ```
 
 ---
