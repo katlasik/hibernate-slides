@@ -444,7 +444,7 @@ select id, name From Author
 
 from Employee e where e.id = 22
 
-from Author a, Book b where a = book.author
+from Author a, Book b where a = b.author
 
 select b from Author a join a.books b where a.id = :id
 
